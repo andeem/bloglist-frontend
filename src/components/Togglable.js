@@ -9,12 +9,14 @@ class Togglable extends React.Component {
     }
 
     toggleVisibility = () => {
-        this.setState({visible: !this.state.visible})
+        this.setState({ visible: !this.state.visible })
     }
 
     render() {
-        const hideWhenVisible = { display: this.state.visible ? 'none' : ''}
-        const showWhenVisible = { display: this.state.visible ? '' : 'none'}
+        const hideWhenVisible = { display: this.state.visible ? 'none' : '' }
+        const showWhenVisible = { display: this.state.visible ? '' : 'none' }
+
+
 
         return (
             <div>
@@ -28,6 +30,10 @@ class Togglable extends React.Component {
 
             </div>
         )
+
+
+
+
     }
 }
 

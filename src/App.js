@@ -5,6 +5,7 @@ import loginService from './services/login'
 import helpers from './utils/helpers'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import Notifcation from './components/Notification'
 
 class App extends React.Component {
   constructor(props) {
@@ -16,7 +17,8 @@ class App extends React.Component {
       password: '',
       url: '',
       title: '',
-      author: ''
+      author: '',
+      message: ''
     }
   }
 
@@ -32,14 +34,25 @@ class App extends React.Component {
       author,
       url
     }
-    const addedBlog = await blogService.addBlog(blog)
-    this.setState({
-      blogs: this.state.blogs.concat(addedBlog),
-      url: '',
-      author: '',
-      title: ''
-    })
-    this.blogForm.toggleVisibility()
+    try {
+      const addedBlog = await blogService.addBlog(blog)
+      this.setState({ message: `Lisättiin ${addedBlog.title} käyttäjältä ${addedBlog.author}` })
+      setTimeout(() => {
+        this.setState({ message: '' })
+      }, 5000)
+      this.setState({
+        blogs: this.state.blogs.concat(addedBlog),
+        url: '',
+        author: '',
+        title: ''
+      })
+      this.blogForm.toggleVisibility()
+    } catch (exception) {
+      this.setState({ message: `Blogin lisäys epäonnistui` })
+      setTimeout(() => {
+        this.setState({ message: '' })
+      }, 5000)
+    }
   }
 
   componentDidMount() {
@@ -71,9 +84,16 @@ class App extends React.Component {
         user
       })
 
+      this.setState({ message: 'Kirjautuminen onnistui' })
+      setTimeout(() => {
+        this.setState({ message: '' })
+      }, 5000)
       window.localStorage.setItem('user', JSON.stringify(user))
     } catch (exception) {
-      console.log('vääärinman')
+      this.setState({ message: 'Väärä käyttäjätunnus tai salasana' })
+      setTimeout(() => {
+        this.setState({ message: '' })
+      }, 5000)
     }
   }
 
@@ -85,6 +105,7 @@ class App extends React.Component {
     if (this.state.user === null) {
       return (
         <div>
+          <Notifcation message={this.state.message} />
           <h1>Kirjaudu sisään</h1>
           <form onSubmit={this.login}>
             <label>Username:</label>
@@ -108,6 +129,7 @@ class App extends React.Component {
     }
     return (
       <div>
+        <Notifcation message={this.state.message} />
         <h2>Kirjautuneena: {this.state.user.name}</h2>
         <form onSubmit={this.logOut}><input value="Kirjaudu ulos" type="submit" /></form>
         <Togglable buttonlabel="Lisää blogi" ref={component => this.blogForm = component}>
